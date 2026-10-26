@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: lint · typecheck · test · build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        # La versión sale de "packageManager" en package.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Formato
+        run: pnpm format:check
+
+      - name: Lint, typecheck, tests y build
+        run: pnpm check
+        env:
+          TURBO_TELEMETRY_DISABLED: 1
+
+      - name: Cobertura de @rona3d/shared
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-shared
+          path: packages/shared/coverage
+          if-no-files-found: ignore
+          retention-days: 7
