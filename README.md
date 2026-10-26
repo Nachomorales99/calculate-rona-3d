@@ -24,7 +24,7 @@ Este es el monorepo de la plataforma web de Rona 3D, la línea de impresión 3D 
 |                    |                                                                     |
 | ------------------ | ------------------------------------------------------------------- |
 | Web                | Vite 8 · React 19 · TypeScript · Tailwind 4 · PWA                   |
-| API                | NestJS 12 · Mongoose 9 · MongoDB Atlas                              |
+| API                | NestJS 12 · Drizzle · PostgreSQL (Neon)                             |
 | Identidad          | Auth0 (JWT)                                                         |
 | Dominio compartido | `@rona3d/shared`: motor de cálculo puro con tests (Vitest)          |
 | Tooling            | pnpm 12 · Turborepo · ESLint 10 · Prettier · Husky · GitHub Actions |
