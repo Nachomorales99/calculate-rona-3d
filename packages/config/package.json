@@ -1,0 +1,31 @@
+{
+  "name": "@rona3d/config",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Configuración compartida de ESLint, Prettier y TypeScript para el monorepo de Rona 3D",
+  "type": "module",
+  "exports": {
+    "./eslint/base": "./eslint/base.js",
+    "./eslint/react": "./eslint/react.js",
+    "./prettier": "./prettier.js",
+    "./tsconfig/*": "./tsconfig/*"
+  },
+  "files": [
+    "eslint",
+    "tsconfig",
+    "prettier.js"
+  ],
+  "dependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.13.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.7",
+    "globals": "^17.13.0",
+    "typescript-eslint": "^8.72.0"
+  },
+  "peerDependencies": {
+    "prettier": "^3.0.0",
+    "typescript": ">=5.0.0"
+  }
+}
