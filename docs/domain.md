@@ -66,4 +66,10 @@ Roles: `user` (default), `admin` (gestiona usuarios, ve métricas, nombra admins
 
 ## Moneda
 
-Cada usuario (o navegador) tiene una moneda de trabajo: código ISO, locale y paso de redondeo. Los precios se cargan en esa moneda; no hay conversión automática. Catálogo en `packages/shared/src/currency/currencies.ts`.
+Cada usuario (o navegador) tiene una moneda de trabajo: código ISO, locale y paso de redondeo. Los precios de la calculadora se cargan en esa moneda; **no hay conversión automática**. Catálogo en `packages/shared/src/currency/currencies.ts`.
+
+La **única** conversión del sistema es la del precio de la suscripción (USD 5 de referencia → moneda local), con tasas cacheadas a diario y control del admin (ADR 0006).
+
+## Geografía
+
+País (ISO 3166-1) y subdivisión (ISO 3166-2) salen de un dataset propio servido por `GET /geo/*` (ADR 0005). Al elegir país se sugiere su moneda. `users.country` guarda el código (`AR`) y `users.subdivision` el código ISO (`AR-M`); la ciudad es texto libre.
