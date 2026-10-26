@@ -37,7 +37,7 @@ jobs:
 
       - name: Cobertura de @rona3d/shared
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-shared
           path: packages/shared/coverage
