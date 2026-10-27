@@ -1,0 +1,16 @@
+{
+  "extends": "@rona3d/config/tsconfig/vite.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "types": [
+      "node",
+      "vite/client",
+      "vite-plugin-pwa/react",
+      "@testing-library/jest-dom",
+      "vitest/globals"
+    ]
+  },
+  "include": ["src", "vite.config.ts", "vitest.setup.ts"]
+}

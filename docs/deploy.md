@@ -5,10 +5,10 @@
 ## Vercel — `apps/web`
 
 - Proyecto apuntando al repo, **Root Directory: `apps/web`**, Framework: Vite.
-- Build: `pnpm turbo build --filter=web`. Install: `pnpm install --frozen-lockfile`. Output: `apps/web/dist`.
+- Build Command: `cd ../.. && pnpm turbo run build --filter=web`. Install Command: `cd ../.. && pnpm install --frozen-lockfile`. Output Directory: `dist`. Node 24 (Settings → General → Node.js Version).
 - Preview automático por PR; producción desde `main`.
 - Variables: `VITE_API_URL`, `VITE_AUTH0_DOMAIN`, `VITE_AUTH0_CLIENT_ID`, `VITE_AUTH0_AUDIENCE`.
-- SPA: `vercel.json` con rewrite de todo a `/index.html` (salvo assets).
+- SPA: `apps/web/vercel.json` reescribe todo a `/index.html` salvo assets, íconos y el service worker, y fija los headers de caché.
 
 ## Render — `apps/api`
 
