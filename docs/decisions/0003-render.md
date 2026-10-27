@@ -1,5 +1,7 @@
 # 0003 · API en Render (no Railway), web en Vercel, datos en Atlas
 
+> La parte de datos fue reemplazada por 0007 (PostgreSQL en Neon).
+
 2026-10-26 · aceptada
 
 ## Contexto

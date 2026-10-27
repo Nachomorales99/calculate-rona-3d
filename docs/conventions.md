@@ -22,8 +22,8 @@ En la API, cada módulo de Nest sigue `controller → service → repository`:
 apps/api/src/modules/quotes/
 ├── quotes.controller.ts   rutas, DTOs (Zod de shared), guards
 ├── quotes.service.ts      reglas de negocio, orquestación
-├── quotes.repository.ts   acceso a Mongo detrás de una interfaz
-├── quotes.schema.ts       esquema de Mongoose
+├── quotes.repository.ts   acceso a la base con Drizzle, detrás de una interfaz
+├── quotes.table.ts        tabla(s) Drizzle del módulo (se reexportan en src/db/schema)
 ├── quotes.module.ts
 └── quotes.service.spec.ts
 ```
@@ -64,7 +64,7 @@ apps/api/src/modules/quotes/
 
 - `shared`: Vitest, un `*.test.ts` por archivo, cobertura ≥ 95 %. Los tests nombran el comportamiento en castellano.
 - `web`: Vitest + Testing Library para hooks y componentes con lógica. Nada de snapshots.
-- `api`: Jest. Services con repositorios mockeados; e2e con `mongodb-memory-server` para los flujos críticos (auth, entitlements, quotes).
+- `api`: Jest. Services con repositorios mockeados; e2e contra un Postgres real (`postgres:17` en Docker, o branch efímero de Neon en CI) para los flujos críticos (auth, entitlements, quotes).
 - Playwright: un smoke que calcula, descarga un PDF y hace login.
 
 ## Commits y ramas

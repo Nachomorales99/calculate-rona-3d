@@ -49,20 +49,32 @@ registro ──▶ trial (30 días) ──▶ active (pago OK) ──▶ past_du
 
 Roles: `user` (default), `admin` (gestiona usuarios, ve métricas, nombra admins). El primer admin es `rona3d.mdz@gmail.com` por seed.
 
-## Modelo de datos (MongoDB)
+La suscripción vive en su propia tabla (`subscriptions`, 1:1 con `users`) para que el historial de pagos (`payments`, fase 5) tenga a qué referenciar.
 
-| Colección          | Campos                                                                                                                                                                                                                                                                     |
-| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `users`            | `auth0Id` (único), `email` (único), `firstName`, `lastName`, `avatarUrl`, `role`, `country`, `city`, `favoritePrinterId`, `currency {code, locale, roundingStep}`, `subscription {status, trialEndsAt, currentPeriodEnd, provider, externalId}`, `createdAt`, `lastSeenAt` |
-| `printers`         | `brand`, `model`, `avgWatts`, `defaultLifeHours`, `price`, `isCatalog`, `ownerId`                                                                                                                                                                                          |
-| `energy_settings`  | `userId`, `currency`, `currentKwhPrice`, `params {adjustmentFactor, taxes[], flatPct}`, `history [{period, provider, unitPrice, kwhPrice, source: manual                                                                                                                   | ai, createdAt}]` |
-| `calc_profiles`    | `userId`, `name`, `printerId`, `filamentType`, `pricePerKg`, `extras[]`, `multiplier`, `multiplyExtras`, `failuresPct`, `repairsPct` — único por `{userId, name}`                                                                                                          |
-| `quotes`           | `userId`, `number` (único por usuario), `currency`, `client`, `description`, `qty`, `unitPrice`, `total`, `validUntil`, `notes`, `snapshot` (inputs + costos, solo para el dueño), `status`, `pdfUrl?`                                                                     |
-| `brand_settings`   | `userId`, `businessName`, `logoUrl`, `colors {accent, ink, paper}`, `contact`, `province`                                                                                                                                                                                  |
-| `feedback_tickets` | `userId?`, `email`, `subject`, `message`, `status`, `emailedAt`                                                                                                                                                                                                            |
-| `plan_settings`    | `priceUsd`, `priceArs`, `updatedAt`, `updatedBy`                                                                                                                                                                                                                           |
-| `ai_usage`         | `userId`, `feature`, `inputTokens`, `outputTokens`, `estimatedCostUsd`, `at`                                                                                                                                                                                               |
-| `audit_log`        | `actorId`, `action`, `target`, `at`                                                                                                                                                                                                                                        |
+La suscripción vive en su propia tabla (`subscriptions`, 1:1 con `users`) para que el historial de cambios de estado y de pagos (`payments`, fase 5) tenga a qué referenciar.
+
+## Modelo de datos (PostgreSQL, ADR 0007)
+
+Tablas en `snake_case`, PK `uuid`, `created_at` / `updated_at` en todas. Dinero en `numeric(14,2)`. Lo semiestructurado va en `jsonb` validado con Zod. Las FK apuntan siempre a `users.id`, nunca al `auth0_id`.
+
+| Tabla              | Columnas principales                                                                                                                                                                                                                               |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `users`            | `auth0_id` (unique), `email` (unique), `first_name`, `last_name`, `avatar_url`, `role` (enum user/admin), `country`, `subdivision`, `city`, `favorite_printer_id` (FK), `currency_code`, `last_seen_at`                                            |
+| `subscriptions`    | `user_id` (FK, unique), `status` (enum), `trial_ends_at`, `current_period_end`, `provider`, `external_id`, `local_currency`, `local_amount`                                                                                                        |
+| `printers`         | `brand`, `model`, `avg_watts`, `default_life_hours`, `price`, `is_catalog`, `owner_id` (FK nullable)                                                                                                                                               |
+| `energy_settings`  | `user_id` (FK, unique), `currency_code`, `current_kwh_price`, `params` (jsonb: factor, impuestos, flat)                                                                                                                                            |
+| `energy_history`   | `user_id` (FK), `period`, `provider`, `unit_price`, `kwh_price`, `source` (enum manual/ai) — unique `(user_id, period)`                                                                                                                            |
+| `calc_profiles`    | `user_id` (FK), `name`, `printer_id` (FK), `filament_type`, `price_per_kg`, `extras` (jsonb), `multiplier`, `multiply_extras`, `failures_pct`, `repairs_pct` — unique `(user_id, name)`                                                            |
+| `quotes`           | `user_id` (FK), `number` (unique `(user_id, number)`, asignado en transacción), `currency_code`, `client`, `description`, `qty`, `unit_price`, `total`, `valid_until`, `notes`, `snapshot` (jsonb, solo para el dueño), `status` (enum), `pdf_url` |
+| `brand_settings`   | `user_id` (FK, unique), `business_name`, `logo_url`, `colors` (jsonb), `contact`, `province`                                                                                                                                                       |
+| `feedback_tickets` | `user_id` (FK nullable), `email`, `subject`, `message`, `status` (enum), `emailed_at`                                                                                                                                                              |
+| `plan_settings`    | fila única: `price_usd`, `rate_buffer`, `ars_rate_type`, `updated_by`                                                                                                                                                                              |
+| `plan_prices`      | `currency_code` (PK), `amount`, `computed_at`, `override_amount`, `override_by`, `override_at`                                                                                                                                                     |
+| `exchange_rates`   | `code` (PK), `base`, `rate`, `source`, `fetched_at` (ADR 0006)                                                                                                                                                                                     |
+| `ai_usage`         | `user_id` (FK), `feature`, `input_tokens`, `output_tokens`, `estimated_cost_usd`                                                                                                                                                                   |
+| `audit_log`        | `actor_id` (FK), `action`, `target_type`, `target_id`, `payload` (jsonb)                                                                                                                                                                           |
+
+Cada app nueva que necesite tablas propias usa su propio `schema` de Postgres (`blog.posts`, etc.) dentro de la misma base.
 
 ## Moneda
 

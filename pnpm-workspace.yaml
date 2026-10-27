@@ -1,3 +1,7 @@
 packages:
   - apps/*
   - packages/*
+
+# Builds permitidos. core-js lo trae @vitejs/plugin-react; su postinstall solo muestra un aviso.
+allowBuilds:
+  core-js: false

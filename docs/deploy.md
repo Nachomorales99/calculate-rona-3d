@@ -1,27 +1,28 @@
 # Deploy y servicios externos
 
-> Las cuentas (Vercel, Render, Auth0, MongoDB Atlas) ya existen y están conectadas al GitHub de Nacho. Este documento se completa con los IDs y URLs reales a medida que se configuran (fase 1 y 2). **Nunca** se escriben secretos acá.
+> Las cuentas (Vercel, Render, Auth0) ya existen; Neon se crea en la fase 2 (ADR 0007) y están conectadas al GitHub de Nacho. Este documento se completa con los IDs y URLs reales a medida que se configuran (fase 1 y 2). **Nunca** se escriben secretos acá.
 
 ## Vercel — `apps/web`
 
 - Proyecto apuntando al repo, **Root Directory: `apps/web`**, Framework: Vite.
-- Build: `pnpm turbo build --filter=web`. Install: `pnpm install --frozen-lockfile`. Output: `apps/web/dist`.
+- Build Command: `cd ../.. && pnpm turbo run build --filter=web`. Install Command: `cd ../.. && pnpm install --frozen-lockfile`. Output Directory: `dist`. Node 24 (Settings → General → Node.js Version).
 - Preview automático por PR; producción desde `main`.
 - Variables: `VITE_API_URL`, `VITE_AUTH0_DOMAIN`, `VITE_AUTH0_CLIENT_ID`, `VITE_AUTH0_AUDIENCE`.
-- SPA: `vercel.json` con rewrite de todo a `/index.html` (salvo assets).
+- SPA: `apps/web/vercel.json` reescribe todo a `/index.html` salvo assets, íconos y el service worker, y fija los headers de caché.
 
 ## Render — `apps/api`
 
 - Web Service desde Docker (`apps/api/Dockerfile`, build multi-stage: instala con pnpm, compila, imagen final solo con `dist` + deps de producción).
 - Healthcheck: `GET /health`. Región: la más cercana a Argentina disponible.
 - Deploy automático desde `main`. Plan gratuito al principio (se duerme con inactividad; aceptable hasta que haya usuarios pagos).
-- Variables: `NODE_ENV`, `PORT`, `MONGODB_URI`, `AUTH0_DOMAIN`, `AUTH0_AUDIENCE`, `WEB_ORIGIN`, `RESEND_API_KEY`, `CLOUDINARY_URL`, `ANTHROPIC_API_KEY`, `MP_ACCESS_TOKEN`, `MP_WEBHOOK_SECRET`.
+- Variables: `NODE_ENV`, `PORT`, `DATABASE_URL`, `AUTH0_DOMAIN`, `AUTH0_AUDIENCE`, `WEB_ORIGIN`, `RESEND_API_KEY`, `CLOUDINARY_URL`, `ANTHROPIC_API_KEY`, `MP_ACCESS_TOKEN`, `MP_WEBHOOK_SECRET`.
 
-## MongoDB Atlas
+## Neon (PostgreSQL)
 
-- Cluster M0. Bases: `rona3d` (producción) y `rona3d-dev`.
-- Usuario de aplicación con `readWrite` solo sobre esas bases.
-- Network access: IPs salientes de Render + la IP de desarrollo de Nacho. Nada de `0.0.0.0/0` en producción.
+- Proyecto `rona3d`, Postgres 17. Branch `main` = producción; branch `dev` para desarrollo; en CI se puede crear un branch efímero por PR.
+- Rol de aplicación con permisos solo sobre la base `rona3d`. `DATABASE_URL` con `sslmode=require`.
+- Migraciones: `pnpm --filter api db:migrate` corre en el `preDeploy` de Render antes de levantar la nueva versión.
+- Local sin Neon: `docker compose up db` levanta `postgres:17` en `localhost:5432`.
 
 ## Auth0
 

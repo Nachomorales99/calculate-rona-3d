@@ -1,0 +1,117 @@
+@import "tailwindcss";
+@import "@fontsource/alfa-slab-one/400.css";
+@import "@fontsource-variable/archivo";
+
+/* Tokens de marca Rona 3D (ver docs/design-system.md). Claro por defecto; oscuro por sistema o por data-theme. */
+@theme {
+  --color-paper: #f5efe4;
+  --color-surface: #ffffff;
+  --color-field: #ffffff;
+  --color-ink: #16161a;
+  --color-muted: #5e5a55;
+  --color-line: #ddd3c2;
+  --color-accent: #e14424;
+  --color-accent-ink: #ffffff;
+  --color-plate: #16161a;
+  --color-plate-ink: #f5efe4;
+  --color-plate-muted: #b9b2a6;
+  --color-plate-edge: rgb(245 239 228 / 0.18);
+  --color-plate-line: rgb(245 239 228 / 0.06);
+  --color-shadow: #16161a;
+
+  --font-slab: "Alfa Slab One", "Rockwell", Georgia, serif;
+  --font-sans: "Archivo Variable", "Archivo", "Helvetica Neue", Arial, sans-serif;
+
+  --radius-pill: 999px;
+  --radius-xl: 18px;
+  --radius-lg: 14px;
+  --radius-md: 12px;
+  --radius-sm: 10px;
+
+  --shadow-hard: 3px 3px 0 var(--color-shadow);
+  --shadow-hard-lg: 4px 4px 0 var(--color-shadow);
+  --shadow-soft: 0 1px 0 var(--color-line), 3px 3px 0 var(--color-line);
+  --shadow-soft-lg: 0 1px 0 var(--color-line), 6px 6px 0 var(--color-line);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --color-paper: #16161a;
+      --color-surface: #1f1f24;
+      --color-field: #18181d;
+      --color-ink: #f5efe4;
+      --color-muted: #aba498;
+      --color-line: #34343c;
+      --color-plate: #0e0e11;
+      --color-plate-edge: rgb(245 239 228 / 0.16);
+      --color-shadow: #f5efe4;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --color-paper: #16161a;
+    --color-surface: #1f1f24;
+    --color-field: #18181d;
+    --color-ink: #f5efe4;
+    --color-muted: #aba498;
+    --color-line: #34343c;
+    --color-plate: #0e0e11;
+    --color-plate-edge: rgb(245 239 228 / 0.16);
+    --color-shadow: #f5efe4;
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-padding-top: 5rem;
+  }
+  body {
+    @apply bg-paper text-ink font-sans antialiased;
+    font-size: 16px;
+    line-height: 1.5;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-slab font-normal;
+    line-height: 1.05;
+    text-wrap: balance;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+}
+
+@utility layers {
+  background-image: repeating-linear-gradient(
+    0deg,
+    var(--color-plate-line) 0 1px,
+    transparent 1px 4px
+  );
+}
+
+@utility gutter {
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
